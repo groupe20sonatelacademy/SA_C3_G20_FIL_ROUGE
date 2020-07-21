@@ -6,9 +6,11 @@ use App\Repository\ProfilsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass=ProfilsRepository::class)
+ * @apiResource
  */
 class Profils
 {
@@ -30,7 +32,7 @@ class Profils
     private $archivage;
 
     /**
-     * @ORM\OneToMany(targetEntity=Users::class, mappedBy="profil")
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="profil")
      */
     private $users;
 
@@ -38,6 +40,7 @@ class Profils
     {
         $this->users = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -69,14 +72,14 @@ class Profils
     }
 
     /**
-     * @return Collection|Users[]
+     * @return Collection|User[]
      */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(Users $user): self
+    public function addUser(User $user): self
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
@@ -86,7 +89,7 @@ class Profils
         return $this;
     }
 
-    public function removeUser(Users $user): self
+    public function removeUser(User $user): self
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
