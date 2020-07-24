@@ -45,7 +45,7 @@ security:
     # Permet de gérer les rôles
     access_control:
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/profiles, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/profils, roles: IS_AUTHENTICATED_FULLY, methods: [GET, PUT, DELETE] }
         - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY, methods: [GET, PUT, DELETE] }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

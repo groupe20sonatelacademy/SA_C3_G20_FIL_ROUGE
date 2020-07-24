@@ -29,34 +29,36 @@ class AppFixtures extends Fixture
 
         $faker = Factory::create('fr_FR');
 
-        for($i=0;$i<3;$i++) {
+            $profils = ['Administrateur', 'CM', 'Formateur','Apprenant'];
 
-            $profil = new Profils();
+            foreach($profils as $libelle){
+                $profil = new Profils();
+                $profil->setLibelle($libelle)
+                    ->setArchivage(1);
+                $manager->persist($profil);
+                $manager->flush();
 
-            $profil->setLibelle($faker->unique()->randomElement(['Administrateur', 'CM', 'Formateur']))
-                ->setArchivage(1);
+                for($i=0;$i<3;$i++){
 
-            $manager->persist($profil);
+                    $user = new User();
 
+                    $hash = $this->encoder->encodePassword($user,"password");
 
-                $user = new User();
+                    $user->setNom($faker->lastName)
+                        ->setPrenom($faker->firstName)
+                        ->setGenre($faker->randomElement(['Homme', 'Femmme']))
+                        ->setUsername($faker->userName)
+                        ->setPassword($hash)
+                        ->setEmail($faker->email)
+                        ->setTelephone($faker->phoneNumber)
+                        ->setPhoto("default.png")
+                        ->setProfil($profil)
+                        ->setArchivage(1);
 
-                $hash = $this->encoder->encodePassword($user,"password");
+                    $manager->persist($user);
+                }
+                $manager->flush();
 
-                $user->setNom($faker->lastName)
-                    ->setPrenom($faker->firstName)
-                    ->setGenre($faker->randomElement(['Homme', 'Femmme']))
-                    ->setUsername($faker->userName)
-                    ->setPassword($hash)
-                    ->setEmail($faker->email)
-                    ->setTelephone($faker->phoneNumber)
-                    ->setPhoto("default.png")
-                    ->setArchivage(1)
-                    ->setProfil($profil);
-
-                $manager->persist($user);
-
+            }
         }
-        $manager->flush();
-    }
 }
