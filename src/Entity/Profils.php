@@ -15,25 +15,45 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ProfilsRepository::class)
  * @apiResource(
- * itemOperations = {"GET","PUT","PATCH","DELETE":{
- *      "method"="post",
- *      "path"="/profils/{id}/archivage",
- *      "controller"="App\Controller\ArchivageProfilMethodController",
- *      "swagger_context"={
- *          "summary"="Permet la suppression d'un profil",
- *          "description"="En réalité cela gère l'archivage"
- *              }
- *          }
+ * itemOperations = {
+ *      "GET"={
+ *          "security"="is_granted('ROLE_Administrateur')"
  *      },
- *     attributes={
-            "pagination_items_per_page"=2
- *     },
- *     normalizationContext={
- *          "groups"={"profil_read"}
- *     },
- *     subresourceOperations={
- *          "users_get_subresource"={"patch"="/profils/{id}/users"}
+ *      "PUT"={
+ *          "security"="is_granted('ROLE_Administrateur')",
+ *          "security_message"="Vous n'avez les autorisations requises"
+ *      },
+ *      "profil_archivage"={
+ *          "method"="put",
+ *          "path"="/profils/{id}/archivage",
+ *          "controller"="App\Controller\ArchivageProfilMethodController",
+ *          "security"="is_granted('ROLE_Administrateur')",
+ *          "security_message"="Vous n'avez les autorisations requises"
  *      }
+ * },
+ * attributes={
+ *         "pagination_items_per_page"=2
+ *     },
+ * normalizationContext={
+ *          "groups"={
+ *            "profil_read"
+ *         }
+ *     },
+ * subresourceOperations={
+ *          "users_get_subresource"={
+ *              "patch"="/profils/{id}/users"
+ *            }
+ *      },
+ * collectionOperations = {
+ *      "GET"={
+ *          "security"="is_granted('ROLE_Administrateur')",
+ *          "security_message"="Vous n'avez les autorisations requises"
+ *      },
+ *      "POST"={
+ *          "security"="is_granted('ROLE_Administrateur')",
+ *          "security_message"="Vous n'avez les autorisations requises"
+ *      }
+ *   }
  * )
  */
 class Profils

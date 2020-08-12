@@ -2,42 +2,63 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use App\Repository\UserRepository;
+use Doctrine\ORM\Mapping\DiscriminatorMap;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * 
+ * @ORM\InheritanceType("JOINED")
+ * @DiscriminatorColumn(name="profil", type="string")
+ * @DiscriminatorMap({"user"="User","apprenant" = "Apprenants","formateur","Formateur"})
  * @UniqueEntity("email",message="Cet email existe déja")
  * @UniqueEntity("username",message="Ce username existe déjà")
  * @UniqueEntity("telephone",message="Ce numéro de téléphone existe déjà")
- * 
- * @apiResource(
- *  itemOperations = {"GET","PUT","PATCH","DELETE":{
- *      "method"="post",
- *      "path"="/users/{id}/archivage",
- *      "controller"="App\Controller\ArchivageUserMethodController",
- *      "swagger_context"={
- *          "summary"="Permet la suppression d'un user",
- *          "description"="En réalité cela gère l'archivage"
- *              }
- *          }
+ * @ApiResource(
+ *     attributes={
+ *          "security"="is_granted('ROLE_Administrateur') or is_granted('ROLE_Apprenant')",
+ *          "security_message"="Vous n'avez les autorisations requises"
+ *       },
+ *     itemOperations = {
+ *      "GET"={
+ *           "security" = "is_granted('USER_VIEW', object)",
+ *           "security_message" = "Vous n'avez pas les autorisations requises"
  *      },
- *     subresourceOperations={
- *          "api_profils_users_get_subresource"={
- *               "normalization_context"={"groups"={"users_subresource"}}
+ *      "PUT"={
+ *           "security" = "is_granted('USER_EDIT', object)",
+ *           "security_message" = "Vous n'avez pas les autorisations requises"
+ *       },
+ *      "user_archivage"={
+ *          "method"="put",
+ *          "path"="/users/{id}/archivage",
+ *          "controller"=App\Controller\Api\ArchivageUser::class,
+ *          "security" = "is_granted('USER_EDIT', object)",
+ *          "security_message" = "Vous n'avez pas les autorisations requises"
+ *       }
+ *     },
+ *     collectionOperations = {
+ *          "GET"={
+ *               "security" = "is_granted('ROLE_Administrateur')",
+ *               "security_message" = "Vous n'avez pas les autorisations requises"
+ *          },
+ *          "POST"={
+ *              "security_post_denormalize" = "is_granted('USER_CREATE', object)",
+ *              "security_post_denormalize_message" = "Vous n'avez pas les autorisations requises"
  *          }
  *     },
- *    normalizationContext={
- *          "groups"={"user_read"}
- *       }
- *    )
+ *     normalizationContext={
+ *          "groups"={
+ *            "user_read"
+ *         }
+ *     }
+ * )
  * 
  */
 class User implements UserInterface
@@ -47,7 +68,7 @@ class User implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
@@ -60,9 +81,9 @@ class User implements UserInterface
      * )
      * @Groups({"user_read", "profil_read", "users_subresource"})
      */
-    private $username;
+    protected $username;
 
-    
+
     private $roles = [];
 
     /**
@@ -75,32 +96,36 @@ class User implements UserInterface
      *      maxMessage="Le password ne doit pas être supérieur à 255 caractères"
      * )
      */
-    private $password;
+    protected $password;
 
     /**
      * @ORM\Column(type="string", length=20)
      * @Assert\NotBlank(message="Veuillez renseigner le password")
      * @Groups({"user_read", "profil_read","users_subresource"})
      */
-    private $telephone;
+    protected $telephone;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Veuillez renseigner le téléphone de l'utilisateur")
      * @Groups({"user_read", "profil_read"})
      */
-    private $photo;
+    protected $photo;
 
     /**
      * @ORM\Column(type="string", length=6)
      * @Assert\NotBlank(message="Veuillez renseigner le genre de l'utilisateur")
      * @Groups({"user_read"})
      */
-    private $genre;
+    protected $genre;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank(message="Veuillez définir l'archivage")
+     * @Assert\Regex(
+     *      pattern = "/^(1|0)$/",
+     *      message = "L'archivage doit être soit 1 ou 0"
+     * )
      */
     private $archivage;
 
@@ -108,9 +133,9 @@ class User implements UserInterface
      * @ORM\ManyToOne(targetEntity=Profils::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\NotBlank(message="Veuillez renseigner le profil de l'utilisateur")
-     * @Groups({"user_read","profil_read"})
+     * @Groups({"user_read"})
      */
-    private $profil;
+    protected $profil;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -123,7 +148,7 @@ class User implements UserInterface
      * )
      * @Groups({"user_read", "profil_read"})
      */
-    private $nom;
+    protected $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -136,7 +161,7 @@ class User implements UserInterface
      * )
      * @Groups({"user_read", "profil_read", "users_subresource"})
      */
-    private $prenom;
+    protected $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -144,7 +169,8 @@ class User implements UserInterface
      * @Assert\Email(message="L'email est invalide")
      * @Groups({"user_read", "profil_read", "users_subresource"})
      */
-    private $email;
+    protected $email;
+    #
 
     public function getId(): ?int
     {
@@ -215,7 +241,7 @@ class User implements UserInterface
      */
     public function eraseCredentials()
     {
-        // If you store any temporary, sensitive data on the user, clear it here
+        // If you store any temporary, sensitive daa on the user, clear it here
         // $this->plainPassword = null;
     }
 
