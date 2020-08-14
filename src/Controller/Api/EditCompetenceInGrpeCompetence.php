@@ -4,7 +4,7 @@
 namespace App\Controller\Api;
 
 
-class ArchivageGrpeCompetenceCompetence
+class EditCompetenceInGrpeCompetence
 {
 
 }

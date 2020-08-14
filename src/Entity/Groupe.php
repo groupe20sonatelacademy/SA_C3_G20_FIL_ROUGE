@@ -35,13 +35,20 @@ class Groupe
     private $apprenants;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Formateur::class, inversedBy="groupes")
+     * @ORM\ManyToOne(targetEntity=Promotion::class, inversedBy="groupes", cascade={"persist"})
      */
-    private $formateur;
+    private $promotion;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Formateur::class, inversedBy="groupes")
+     */
+    private $formateurs;
 
     public function __construct()
     {
         $this->apprenants = new ArrayCollection();
+        $this->formateurs = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -99,15 +106,42 @@ class Groupe
         return $this;
     }
 
-    public function getFormateur(): ?Formateur
+    public function getPromotion(): ?Promotion
     {
-        return $this->formateur;
+        return $this->promotion;
     }
 
-    public function setFormateur(?Formateur $formateur): self
+    public function setPromotion(?Promotion $promotion): self
     {
-        $this->formateur = $formateur;
+        $this->promotion = $promotion;
 
         return $this;
     }
+
+    /**
+     * @return Collection|Formateur[]
+     */
+    public function getFormateurs(): Collection
+    {
+        return $this->formateurs;
+    }
+
+    public function addFormateur(Formateur $formateur): self
+    {
+        if (!$this->formateurs->contains($formateur)) {
+            $this->formateurs[] = $formateur;
+        }
+
+        return $this;
+    }
+
+    public function removeFormateur(Formateur $formateur): self
+    {
+        if ($this->formateurs->contains($formateur)) {
+            $this->formateurs->removeElement($formateur);
+        }
+
+        return $this;
+    }
+
 }

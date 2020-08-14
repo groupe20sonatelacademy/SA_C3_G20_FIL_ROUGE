@@ -105,7 +105,7 @@ class Competences
     private $archivage;
 
     /**
-     * @ORM\ManyToMany(targetEntity=GroupeCompetences::class, mappedBy="competences")
+     * @ORM\ManyToMany(targetEntity=GroupeCompetences::class, mappedBy="competences", cascade={"persist"})
      * @Groups({"competences_read"})
      */
     private $groupeCompetences;

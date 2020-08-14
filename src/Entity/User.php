@@ -17,7 +17,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\InheritanceType("JOINED")
  * @DiscriminatorColumn(name="profil", type="string")
- * @DiscriminatorMap({"user"="User","apprenant" = "Apprenants","formateur","Formateur"})
+ * @DiscriminatorMap({"user"="User","apprenant" = "Apprenants","formateur" = "Formateur"})
  * @UniqueEntity("email",message="Cet email existe déja")
  * @UniqueEntity("username",message="Ce username existe déjà")
  * @UniqueEntity("telephone",message="Ce numéro de téléphone existe déjà")

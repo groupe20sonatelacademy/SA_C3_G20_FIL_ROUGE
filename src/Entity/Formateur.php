@@ -6,9 +6,11 @@ use App\Repository\FormateurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass=FormateurRepository::class)
+ * @ApiResource
  */
 class Formateur extends User
 {
@@ -20,7 +22,7 @@ class Formateur extends User
     protected $id;
 
     /**
-     * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="formateur")
+     * @ORM\ManyToMany(targetEntity=Groupe::class, mappedBy="formateurs")
      */
     private $groupes;
 
@@ -28,6 +30,7 @@ class Formateur extends User
     {
         $this->groupes = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -46,7 +49,7 @@ class Formateur extends User
     {
         if (!$this->groupes->contains($groupe)) {
             $this->groupes[] = $groupe;
-            $groupe->setFormateur($this);
+            $groupe->addFormateur($this);
         }
 
         return $this;
@@ -56,10 +59,7 @@ class Formateur extends User
     {
         if ($this->groupes->contains($groupe)) {
             $this->groupes->removeElement($groupe);
-            // set the owning side to null (unless already changed)
-            if ($groupe->getFormateur() === $this) {
-                $groupe->setFormateur(null);
-            }
+            $groupe->removeFormateur($this);
         }
 
         return $this;

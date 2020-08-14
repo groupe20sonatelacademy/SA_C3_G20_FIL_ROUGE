@@ -17,32 +17,31 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  *
  * ---------------------- API PLATFORM --------------------------
  * @ApiResource (
+ *     routePrefix="/admin",
  *     attributes={
  *      "security" = "is_granted('ROLE_Administrateur')",
  *      "security_message" = "Vous n'avez pas les autorisations requises"
  *     },
  *     itemOperations={
  *          "GET" = {
- *              "path" = "/admin/grpecompetences/{id}"
- *          },
- *          "PUT" = {
- *              "path" = "/admin/grpecompetences{id}",
  *              "requirements"={"id"="\d+"}
  *          },
  *          "Archivage_competence" = {
  *                "method" = "PUT",
- *                "path" = "admin/grpecompetences/{id}/archivage",
+ *                "path" = "/groupe_competences/{id}/archivage",
  *                "requirements"={"id"="\d+"},
  *                "controller" = App\Controller\Api\ArchivageGrpeCompetences::class
- *           }
+ *           },
+ *           "update_groupe_competence" = {
+ *                  "method" = "PUT",
+ *                  "path" = "/groupe_competences/{id}",
+ *                  "requirements"={"id"="\d+"},
+ *                  "route_name" = "edition_competence_in_grpe_competence"
+ *          }
  *     },
  *     collectionOperations={
- *          "GET" = {
- *              "path" = "/admin/grpecompetences"
- *          },
- *          "POST" = {
- *              "path" = "admin/grpecompetences"
- *          }
+ *          "GET" = {},
+ *          "POST" = {}
  *     },
  *     normalizationContext={
  *          "groups" = {
@@ -84,7 +83,7 @@ class GroupeCompetences
     private $archivage;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Competences::class, inversedBy="groupeCompetences")
+     * @ORM\ManyToMany(targetEntity=Competences::class, inversedBy="groupeCompetences", cascade={"persist"})
      * @Groups({"grpecompetences_read","tags_read"})
      * @ApiSubresource
      */

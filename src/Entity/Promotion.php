@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\PromotionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,24 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=PromotionRepository::class)
+ *
+ * --------------------- API PLATFORM --------------------
+ * @ApiResource(
+ *     itemOperations={
+ *          "GET" = {
+ *              "path" = "/admin/promo/{id}"
+ *          }
+ *     },
+ *     collectionOperations={
+ *          "GET" = {
+ *              "path" = "/admin/promo"
+ *          },
+ *          "POST"={
+ *              "path" = "/admin/promo"
+ *          }
+ *     }
+ * )
+ * -------------------------------------------------------
  */
 class Promotion
 {
@@ -35,7 +54,7 @@ class Promotion
     private $lieuPromotion;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $referenceAgate;
 
@@ -45,12 +64,12 @@ class Promotion
     private $fabrique;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string")
      */
     private $dateDebut;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string")
      */
     private $dateFin;
 
@@ -59,9 +78,15 @@ class Promotion
      */
     private $referentiels;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="promotion", cascade={"persist"})
+     */
+    private $groupes;
+
     public function __construct()
     {
         $this->referentiels = new ArrayCollection();
+        $this->groupes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -174,6 +199,37 @@ class Promotion
     {
         if ($this->referentiels->contains($referentiel)) {
             $this->referentiels->removeElement($referentiel);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Groupe[]
+     */
+    public function getGroupes(): Collection
+    {
+        return $this->groupes;
+    }
+
+    public function addGroupe(Groupe $groupe): self
+    {
+        if (!$this->groupes->contains($groupe)) {
+            $this->groupes[] = $groupe;
+            $groupe->setPromotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupe(Groupe $groupe): self
+    {
+        if ($this->groupes->contains($groupe)) {
+            $this->groupes->removeElement($groupe);
+            // set the owning side to null (unless already changed)
+            if ($groupe->getPromotion() === $this) {
+                $groupe->setPromotion(null);
+            }
         }
 
         return $this;
