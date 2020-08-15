@@ -2,14 +2,64 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\UserRepository;
+use Doctrine\ORM\Mapping\DiscriminatorMap;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @apiResource
+ * @ORM\InheritanceType("JOINED")
+ * @DiscriminatorColumn(name="profil", type="string")
+ * @DiscriminatorMap({"user"="User","apprenant" = "Apprenants","formateur" = "Formateur"})
+ * @UniqueEntity("email",message="Cet email existe déja")
+ * @UniqueEntity("username",message="Ce username existe déjà")
+ * @UniqueEntity("telephone",message="Ce numéro de téléphone existe déjà")
+ * @ApiResource(
+ *     attributes={
+ *          "security"="is_granted('ROLE_Administrateur') or is_granted('ROLE_Apprenant')",
+ *          "security_message"="Vous n'avez les autorisations requises"
+ *       },
+ *     itemOperations = {
+ *      "GET"={
+ *           "security" = "is_granted('USER_VIEW', object)",
+ *           "security_message" = "Vous n'avez pas les autorisations requises"
+ *      },
+ *      "PUT"={
+ *           "security" = "is_granted('USER_EDIT', object)",
+ *           "security_message" = "Vous n'avez pas les autorisations requises"
+ *       },
+ *      "user_archivage"={
+ *          "method"="put",
+ *          "path"="/users/{id}/archivage",
+ *          "controller"=App\Controller\Api\ArchivageUser::class,
+ *          "security" = "is_granted('USER_EDIT', object)",
+ *          "security_message" = "Vous n'avez pas les autorisations requises"
+ *       }
+ *     },
+ *     collectionOperations = {
+ *          "GET"={
+ *               "security" = "is_granted('ROLE_Administrateur')",
+ *               "security_message" = "Vous n'avez pas les autorisations requises"
+ *          },
+ *          "POST"={
+ *              "security_post_denormalize" = "is_granted('USER_CREATE', object)",
+ *              "security_post_denormalize_message" = "Vous n'avez pas les autorisations requises"
+ *          }
+ *     },
+ *     normalizationContext={
+ *          "groups"={
+ *            "user_read"
+ *         }
+ *     }
+ * )
+ * 
  */
 class User implements UserInterface
 {
@@ -18,64 +68,109 @@ class User implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank(message="Veuillez renseigner le username")
+     * @Assert\Length(
+     *      min=8,
+     *      max=180,
+     *      minMessage="Le username ne doit pas être inférieur à 8 caractères",
+     *      maxMessage="Le username ne doit pas être supérieur à 180 caractères"
+     * )
+     * @Groups({"user_read", "profil_read", "users_subresource"})
      */
-    private $username;
+    protected $username;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\Length(
+     *      min=8,
+     *      max=255,
+     *      minMessage="Le password ne doit pas être inférieur à 8 caractères",
+     *      maxMessage="Le password ne doit pas être supérieur à 255 caractères"
+     * )
      */
-    private $password;
+    protected $password;
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Assert\NotBlank(message="Veuillez renseigner le password")
+     * @Groups({"user_read", "profil_read","users_subresource"})
      */
-    private $telephone;
+    protected $telephone;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Veuillez renseigner le téléphone de l'utilisateur")
+     * @Groups({"user_read", "profil_read"})
      */
-    private $photo;
+    protected $photo;
 
     /**
      * @ORM\Column(type="string", length=6)
+     * @Assert\NotBlank(message="Veuillez renseigner le genre de l'utilisateur")
+     * @Groups({"user_read"})
      */
-    private $genre;
+    protected $genre;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="integer")
+     * @Assert\NotBlank(message="Veuillez définir l'archivage")
+     * @Assert\Regex(
+     *      pattern = "/^(1|0)$/",
+     *      message = "L'archivage doit être soit 1 ou 0"
+     * )
      */
     private $archivage;
 
     /**
      * @ORM\ManyToOne(targetEntity=Profils::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotBlank(message="Veuillez renseigner le profil de l'utilisateur")
+     * @Groups({"user_read"})
      */
-    private $profil;
+    protected $profil;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Veuillez renseigner le nom de l'utilisateur")
+     * @Assert\Length(
+     *      min=1,
+     *      max=255,
+     *      minMessage="Le nom ne doit pas être inférieur à 1 caractères",
+     *      maxMessage="Le nom ne doit pas être supérieur à 255 caractères"
+     * )
+     * @Groups({"user_read", "profil_read"})
      */
-    private $nom;
+    protected $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Veuillez renseigner le prénom de l'utilisateur")
+     * @Assert\Length(
+     *      min=1,
+     *      max=255,
+     *      minMessage="Le prénom ne doit pas être inférieur à 1 caractères",
+     *      maxMessage="Le prénom ne doit pas être supérieur à 255 caractères"
+     * )
+     * @Groups({"user_read", "profil_read", "users_subresource"})
      */
-    private $prenom;
+    protected $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Veuillez renseigner l'email de l'utilisateur")
+     * @Assert\Email(message="L'email est invalide")
+     * @Groups({"user_read", "profil_read", "users_subresource"})
      */
-    private $email;
+    protected $email;
+    #
 
     public function getId(): ?int
     {
@@ -106,7 +201,7 @@ class User implements UserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles[] = 'ROLE_'.$this->profil->getLibelle();
 
         return array_unique($roles);
     }
@@ -146,7 +241,7 @@ class User implements UserInterface
      */
     public function eraseCredentials()
     {
-        // If you store any temporary, sensitive data on the user, clear it here
+        // If you store any temporary, sensitive daa on the user, clear it here
         // $this->plainPassword = null;
     }
 
@@ -186,12 +281,12 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getArchivage(): ?bool
+    public function getArchivage(): ?int
     {
         return $this->archivage;
     }
 
-    public function setArchivage(bool $archivage): self
+    public function setArchivage(int $archivage): self
     {
         $this->archivage = $archivage;
 
