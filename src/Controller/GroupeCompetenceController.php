@@ -99,6 +99,7 @@ class GroupeCompetenceController extends AbstractController
                 }
             }
         }
+        //Edition des TAGS
         if(!empty($groupeCompetenceTab['updateTags'])){
             //On vérifie si les tags sont concernés par la modification
             foreach ($groupeCompetenceTab['updateTags'] as $updateTags){

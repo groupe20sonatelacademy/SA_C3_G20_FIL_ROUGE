@@ -14,30 +14,32 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * ----------------------- API PLATFORM -------------------
  * @ApiResource(
- *
+ *     routePrefix="/admin",
  *     itemOperations={
  *          "GET" = {
- *               "path" = "/admin/referentiels/{id}",
+ *               "path" = "/referentiels/{id}",
  *               "requirements"={"id"="\d+"}
  *          },
  *          "PUT" = {
- *               "path" = "/admin/referentiels/{id}",
+ *               "path" = "/referentiels/{id}",
  *               "requirements"={"id"="\d+"}
  *          },
  *          "archivage_referentiel" = {
  *               "method" = "PUT",
- *               "path" = "/admin/referentiels/{id}/archivage",
+ *               "path" = "/referentiels/{id}/archivage",
  *               "requirements"={"id"="\d+"},
  *               "controller" = App\Controller\Api\ArchivageReferentiel::class
+ *          },
+ *          "update_referentiel" = {
+ *                  "method" = "PUT",
+ *                  "path" = "/referentiels/{id}",
+ *                  "requirements"={"id"="\d+"},
+ *                  "route_name" = "edition_referentiel"
  *          }
  *     },
  *     collectionOperations={
- *           "GET" = {
- *              "path" = "/admin/referentiels"
- *           },
- *          "POST" = {
- *              "path" = "/admin/referentiels"
- *          }
+ *           "GET" = {},
+ *          "POST" = {}
  *     },
  *     normalizationContext={
  *          "groups" = {"referentiel_read"}
