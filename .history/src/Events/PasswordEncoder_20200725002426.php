@@ -1,0 +1,1 @@
+class PasswordEnder implements EventSubscriberInterface

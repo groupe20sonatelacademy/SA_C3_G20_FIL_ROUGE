@@ -1,0 +1,6 @@
+
+
+<?php
+
+     PasswordEnder implements EventSubscriberInterface
+{
