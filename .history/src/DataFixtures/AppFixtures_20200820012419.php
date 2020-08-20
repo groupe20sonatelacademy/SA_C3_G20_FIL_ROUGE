@@ -136,7 +136,7 @@ class AppFixtures extends Fixture
         $groupeCompetence = new GroupeCompetence();
 
         foreach ($competenceTable as $competenceLibelle) {
- 
+
             $competence = new Competence();
             $competence->setLibelle($competenceLibelle)
             ->setDescriptif($faker->text)
@@ -162,17 +162,16 @@ class AppFixtures extends Fixture
 
             $tabgroupecompetence = [
                 'Créer une base de données ',
-                'Developper une application durable',
-                'Développer les composants d’accès aux données'
+                'Développer les composants d’accès aux données',
+                'Developper une application durable'
             ];
             foreach ($tabgroupecompetence as $libelle) {
             //On génère un groupe de compétence
-            $groupeCompetence->setLibelle($libelle)
+            $groupeCompetence->setLibelle("Développement web")
                 ->setDescriptif($faker->text)
                 ->addCompetence($competence)
                 ->setArchivage(0);
             $manager->persist($groupeCompetence);
-            }
             
         }
 

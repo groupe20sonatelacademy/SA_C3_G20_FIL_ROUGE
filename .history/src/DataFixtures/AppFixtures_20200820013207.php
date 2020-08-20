@@ -162,6 +162,7 @@ class AppFixtures extends Fixture
 
             $tabgroupecompetence = [
                 'Créer une base de données ',
+               
                 'Developper une application durable',
                 'Développer les composants d’accès aux données'
             ];

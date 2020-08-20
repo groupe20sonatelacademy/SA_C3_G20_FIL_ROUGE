@@ -132,11 +132,15 @@ class AppFixtures extends Fixture
         ->setCritereEvaluation($faker->text)
         ->setCritereAdmission($faker->text)
         ->setArchivage(0);
- 
+  $tabgroupecompetence = [
+                'Créer une base de données ',
+                'Développer les composants d’accès aux données',
+                'Developper une application durable'
+            ];
         $groupeCompetence = new GroupeCompetence();
 
         foreach ($competenceTable as $competenceLibelle) {
- 
+
             $competence = new Competence();
             $competence->setLibelle($competenceLibelle)
             ->setDescriptif($faker->text)
@@ -160,11 +164,7 @@ class AppFixtures extends Fixture
 
             $manager->persist($referentiel);
 
-            $tabgroupecompetence = [
-                'Créer une base de données ',
-                'Developper une application durable',
-                'Développer les composants d’accès aux données'
-            ];
+           
             foreach ($tabgroupecompetence as $libelle) {
             //On génère un groupe de compétence
             $groupeCompetence->setLibelle($libelle)

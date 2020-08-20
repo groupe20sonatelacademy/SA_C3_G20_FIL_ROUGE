@@ -162,8 +162,9 @@ class AppFixtures extends Fixture
 
             $tabgroupecompetence = [
                 'Créer une base de données ',
-                'Developper une application durable',
-                'Développer les composants d’accès aux données'
+               
+                'Developper une application durable'
+                'Développer les composants d’accès aux données',
             ];
             foreach ($tabgroupecompetence as $libelle) {
             //On génère un groupe de compétence
