@@ -111,12 +111,18 @@ class Groupe
      */
     private $promo;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Brief::class, mappedBy="groupe")
+     */
+    private $briefs;
+
    
 
     public function __construct()
     {
         $this->apprenant = new ArrayCollection();
         $this->formateur = new ArrayCollection();
+        $this->briefs = new ArrayCollection();
         
     }
 
@@ -245,6 +251,34 @@ class Groupe
     public function setPromo(?Promo $promo): self
     {
         $this->promo = $promo;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Brief[]
+     */
+    public function getBriefs(): Collection
+    {
+        return $this->briefs;
+    }
+
+    public function addBrief(Brief $brief): self
+    {
+        if (!$this->briefs->contains($brief)) {
+            $this->briefs[] = $brief;
+            $brief->addGroupe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrief(Brief $brief): self
+    {
+        if ($this->briefs->contains($brief)) {
+            $this->briefs->removeElement($brief);
+            $brief->removeGroupe($this);
+        }
 
         return $this;
     }
