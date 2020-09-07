@@ -103,11 +103,17 @@ class Competence
      */
     private $niveau;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Statistique::class, mappedBy="commetence")
+     */
+    private $statistiques;
+
     public function __construct()
     {
         
         $this->groupeCompetences = new ArrayCollection();
         $this->niveau = new ArrayCollection();
+        $this->statistiques = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -204,6 +210,37 @@ class Competence
             // set the owning side to null (unless already changed)
             if ($niveau->getCompetence() === $this) {
                 $niveau->setCompetence(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Statistique[]
+     */
+    public function getStatistiques(): Collection
+    {
+        return $this->statistiques;
+    }
+
+    public function addStatistique(Statistique $statistique): self
+    {
+        if (!$this->statistiques->contains($statistique)) {
+            $this->statistiques[] = $statistique;
+            $statistique->setCommetence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStatistique(Statistique $statistique): self
+    {
+        if ($this->statistiques->contains($statistique)) {
+            $this->statistiques->removeElement($statistique);
+            // set the owning side to null (unless already changed)
+            if ($statistique->getCommetence() === $this) {
+                $statistique->setCommetence(null);
             }
         }
 

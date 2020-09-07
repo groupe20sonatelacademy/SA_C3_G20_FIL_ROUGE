@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -64,6 +65,16 @@ class LivrablePartiel
      * @ORM\Column(type="integer")
      */
     private $nombreCorriges;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LivrablePartielApprenant::class, mappedBy="livrablePartiel")
+     */
+    private $livrablePartielApprenants;
+
+    public function __construct()
+    {
+        $this->livrablePartielApprenants = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -191,6 +202,37 @@ class LivrablePartiel
     public function setNombreCorriges(int $nombreCorriges): self
     {
         $this->nombreCorriges = $nombreCorriges;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LivrablePartielApprenant[]
+     */
+    public function getLivrablePartielApprenants(): Collection
+    {
+        return $this->livrablePartielApprenants;
+    }
+
+    public function addLivrablePartielApprenant(LivrablePartielApprenant $livrablePartielApprenant): self
+    {
+        if (!$this->livrablePartielApprenants->contains($livrablePartielApprenant)) {
+            $this->livrablePartielApprenants[] = $livrablePartielApprenant;
+            $livrablePartielApprenant->setLivrablePartiel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivrablePartielApprenant(LivrablePartielApprenant $livrablePartielApprenant): self
+    {
+        if ($this->livrablePartielApprenants->contains($livrablePartielApprenant)) {
+            $this->livrablePartielApprenants->removeElement($livrablePartielApprenant);
+            // set the owning side to null (unless already changed)
+            if ($livrablePartielApprenant->getLivrablePartiel() === $this) {
+                $livrablePartielApprenant->setLivrablePartiel(null);
+            }
+        }
 
         return $this;
     }

@@ -152,12 +152,18 @@ class Promo
      */
     private $promoBriefs;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Chat::class, mappedBy="promo")
+     */
+    private $chats;
+
     public function __construct()
     {
         $this->referentiels = new ArrayCollection();
         $this->formateur = new ArrayCollection();
         $this->groupe = new ArrayCollection();
         $this->promoBriefs = new ArrayCollection();
+        $this->chats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -382,6 +388,37 @@ class Promo
             // set the owning side to null (unless already changed)
             if ($promoBrief->getPromo() === $this) {
                 $promoBrief->setPromo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Chat[]
+     */
+    public function getChats(): Collection
+    {
+        return $this->chats;
+    }
+
+    public function addChat(Chat $chat): self
+    {
+        if (!$this->chats->contains($chat)) {
+            $this->chats[] = $chat;
+            $chat->setPromo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChat(Chat $chat): self
+    {
+        if ($this->chats->contains($chat)) {
+            $this->chats->removeElement($chat);
+            // set the owning side to null (unless already changed)
+            if ($chat->getPromo() === $this) {
+                $chat->setPromo(null);
             }
         }
 

@@ -106,9 +106,15 @@ class Niveau
      */
     private $livrablePartiel;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Statistique::class, mappedBy="niveaux")
+     */
+    private $statistiques;
+
     public function __construct()
     {
         $this->livrablePartiel = new ArrayCollection();
+        $this->statistiques = new ArrayCollection();
     }
 
 
@@ -211,6 +217,37 @@ class Niveau
     {
         if ($this->livrablePartiel->contains($livrablePartiel)) {
             $this->livrablePartiel->removeElement($livrablePartiel);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Statistique[]
+     */
+    public function getStatistiques(): Collection
+    {
+        return $this->statistiques;
+    }
+
+    public function addStatistique(Statistique $statistique): self
+    {
+        if (!$this->statistiques->contains($statistique)) {
+            $this->statistiques[] = $statistique;
+            $statistique->setNiveaux($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStatistique(Statistique $statistique): self
+    {
+        if ($this->statistiques->contains($statistique)) {
+            $this->statistiques->removeElement($statistique);
+            // set the owning side to null (unless already changed)
+            if ($statistique->getNiveaux() === $this) {
+                $statistique->setNiveaux(null);
+            }
         }
 
         return $this;

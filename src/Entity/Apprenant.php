@@ -68,28 +68,28 @@ class Apprenant  extends User
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank( message="L'adresse est obligatoire")
-     * @Groups({"apprenant:read","profilsortieApp:read"})
+     * @Groups({"apprenant:read","profilsortieApp:read","profilsortie:read","chat:read"})
      */
     private $adresse;
 
     /**
      * @ORM\Column(type="string", length=25)
      * @Assert\NotBlank( message="Le statut est obligatoire")
-     * @Groups({"apprenant:read","profilsortieApp:read"})
+     * @Groups({"apprenant:read","profilsortieApp:read","chat:read"})
      */
     private $statut;
 
     /**
      * @ORM\Column(type="string", length=30)
      * @Assert\NotBlank( message="La categorie est obligatoire")
-     * @Groups({"apprenant:read","profilsortieApp:read"})
+     * @Groups({"apprenant:read","profilsortieApp:read","profilsortie:read","chat:read"})
      */
     private $categorie;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank( message="Les infos complementaires  sont obligatoire")
-     * @Groups({"apprenant:read","profilsortieApp:read"})
+     * @Groups({"apprenant:read","profilsortieApp:read","profilsortie:read","chat:read"})
      */
     private $infocomplementaitre;
 
@@ -97,7 +97,6 @@ class Apprenant  extends User
      * @ORM\ManyToOne(targetEntity=Profilsortie::class, inversedBy="Apprenant")
      * @Assert\NotBlank( message="Le profil de sortie est obligatoire")
      * @Groups({"apprenant:read","profilsortieApp:read"})
-     * @ApiSubresource()
      */
     protected $profilsortie;
 
@@ -113,12 +112,28 @@ class Apprenant  extends User
      */
     private $promoBriefApprenants;
 
-    
+    /**
+     * @ORM\OneToMany(targetEntity=LivrablePartielApprenant::class, mappedBy="apprenant")
+     */
+    private $livrablePartielApprenants;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Chat::class, mappedBy="apprenant")
+     */
+    private $chats;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Statistique::class, mappedBy="apprenant")
+     */
+    private $statistiques;
 
     public function __construct()
     {
         $this->groupes = new ArrayCollection();
         $this->promoBriefApprenants = new ArrayCollection();
+        $this->livrablePartielApprenants = new ArrayCollection();
+        $this->chats = new ArrayCollection();
+        $this->statistiques = new ArrayCollection();
         
     }
 
@@ -240,6 +255,99 @@ class Apprenant  extends User
             // set the owning side to null (unless already changed)
             if ($promoBriefApprenant->getApprenant() === $this) {
                 $promoBriefApprenant->setApprenant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LivrablePartielApprenant[]
+     */
+    public function getLivrablePartielApprenants(): Collection
+    {
+        return $this->livrablePartielApprenants;
+    }
+
+    public function addLivrablePartielApprenant(LivrablePartielApprenant $livrablePartielApprenant): self
+    {
+        if (!$this->livrablePartielApprenants->contains($livrablePartielApprenant)) {
+            $this->livrablePartielApprenants[] = $livrablePartielApprenant;
+            $livrablePartielApprenant->setApprenant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivrablePartielApprenant(LivrablePartielApprenant $livrablePartielApprenant): self
+    {
+        if ($this->livrablePartielApprenants->contains($livrablePartielApprenant)) {
+            $this->livrablePartielApprenants->removeElement($livrablePartielApprenant);
+            // set the owning side to null (unless already changed)
+            if ($livrablePartielApprenant->getApprenant() === $this) {
+                $livrablePartielApprenant->setApprenant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Chat[]
+     */
+    public function getChats(): Collection
+    {
+        return $this->chats;
+    }
+
+    public function addChat(Chat $chat): self
+    {
+        if (!$this->chats->contains($chat)) {
+            $this->chats[] = $chat;
+            $chat->setApprenant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChat(Chat $chat): self
+    {
+        if ($this->chats->contains($chat)) {
+            $this->chats->removeElement($chat);
+            // set the owning side to null (unless already changed)
+            if ($chat->getApprenant() === $this) {
+                $chat->setApprenant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Statistique[]
+     */
+    public function getStatistiques(): Collection
+    {
+        return $this->statistiques;
+    }
+
+    public function addStatistique(Statistique $statistique): self
+    {
+        if (!$this->statistiques->contains($statistique)) {
+            $this->statistiques[] = $statistique;
+            $statistique->setApprenant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStatistique(Statistique $statistique): self
+    {
+        if ($this->statistiques->contains($statistique)) {
+            $this->statistiques->removeElement($statistique);
+            // set the owning side to null (unless already changed)
+            if ($statistique->getApprenant() === $this) {
+                $statistique->setApprenant(null);
             }
         }
 
